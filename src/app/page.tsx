@@ -1,4 +1,6 @@
 import Card02 from "@/@/components/xui/card-02";
+import ContactAddition from "@/components/ContactAddition";
+import GetAllContactPage from "@/components/GetAllContactPage";
 import Image from "next/image";
 
 export default function Home() {
@@ -28,34 +30,19 @@ export default function Home() {
             <div className="space-y-6">
               <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-xl rounded-2xl p-6 border border-zinc-200/50 dark:border-zinc-800/50">
                 <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-                  Transaction Info
+                  Add to Contact Info
                 </h2>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-zinc-600 dark:text-zinc-400">
-                      Network Status
-                    </span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                      Connected
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-zinc-600 dark:text-zinc-400">
-                      Wallet Status
-                    </span>
-                    {/* <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                      {publicKey ? "Connected" : "Not Connected"}
-                    </span> */}
-                  </div>
+                  <ContactAddition />
                 </div>
               </div>
 
               <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-xl rounded-2xl p-6 border border-zinc-200/50 dark:border-zinc-800/50">
                 <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-                  Recent Transactions
+                  All Contact's
                 </h2>
                 <div className="text-zinc-600 dark:text-zinc-400 text-sm">
-                  No recent transactions
+                  <GetAllContactPage />
                 </div>
               </div>
             </div>
