@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import {
   PublicKey,
   SystemProgram,
@@ -12,13 +12,26 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { toast } from "sonner";
+import { useContact } from "@/context/ContactContext";
 
 export default function PaymentCard() {
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
+  const { selectedContact } = useContact();
   const [receiverPubkey, setReceiverPubkey] = useState<string>("");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const amountInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (selectedContact) {
+      setReceiverPubkey(selectedContact.publicKey);
+      // Focus on amount input after a short delay
+      setTimeout(() => {
+        amountInputRef.current?.focus();
+      }, 500);
+    }
+  }, [selectedContact]);
 
   const handleSendSol = useCallback(async () => {
     try {
@@ -184,8 +197,9 @@ export default function PaymentCard() {
                 disabled={!publicKey || isLoading}
               />
             </div>
-            <div className="relative">
+            <div className="relative group">
               <Input
+                ref={amountInputRef}
                 type="number"
                 step="0.000000001"
                 placeholder="Enter amount in SOL"
@@ -198,10 +212,15 @@ export default function PaymentCard() {
                   "bg-zinc-50 dark:bg-zinc-800/50",
                   "border-zinc-200 dark:border-zinc-700",
                   "focus:border-zinc-300 dark:focus:border-zinc-600",
-                  "text-zinc-900 dark:text-zinc-100"
+                  "text-zinc-900 dark:text-zinc-100",
+                  "transition-all duration-300",
+                  "group-hover:shadow-lg group-hover:shadow-zinc-200/20 dark:group-hover:shadow-zinc-900/20",
+                  "group-hover:scale-[1.02]",
+                  "group-hover:border-zinc-300/50 dark:group-hover:border-zinc-700/50"
                 )}
                 disabled={!publicKey || isLoading}
               />
+              <div className="absolute inset-0 rounded-md pointer-events-none bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer" />
             </div>
           </div>
         </div>

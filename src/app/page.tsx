@@ -1,6 +1,9 @@
 import Card02 from "@/@/components/xui/card-02";
 import ContactAddition from "@/components/ContactAddition";
 import GetAllContactPage from "@/components/GetAllContactPage";
+import RecentTransactionPage from "@/components/RecentTransactionPage";
+
+import SearchContacts from "@/components/SearchContacts";
 import Image from "next/image";
 
 export default function Home() {
@@ -38,9 +41,15 @@ export default function Home() {
               </div>
 
               <div className="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-xl rounded-2xl p-6 border border-zinc-200/50 dark:border-zinc-800/50">
-                <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-                  All Contact's
-                </h2>
+                <div className="flex flex-row">
+                  <h2 className="flex flex-row text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+                    All Contact's
+                  </h2>
+                  <div className="flex flex-row">
+                    <RecentTransactionPage />
+                  </div>
+                </div>
+
                 <div className="text-zinc-600 dark:text-zinc-400 text-sm">
                   <GetAllContactPage />
                 </div>

@@ -25,10 +25,13 @@
     Day 2
 
   - Now i will make contact page more interactive ,some implementations :
-    - when we click contact on a icon , automatically a pay button creates for that contact
+    - when we click contact on a icon , automatically a pay button creates for that contact -done
     - and after that make recent transaction tracking page for user
-    - add framer and making it more optimize
+      - ideally we need to store all transaction in the database , and we will store transaction in database , but i will index the blockchain and from there i will grab the recent transaction of user public key for learning purpose , and also after every transaction success i need to store it in the database
+    - add framer and making it more optimize - done
     - also a option for requesting payment to user
+    - also add search option in contact for searching on the base of username - done
+    - a toaster message should pop out for payment status
 
   Future Plans :
   A group Payment Mechanism

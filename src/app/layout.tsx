@@ -4,6 +4,7 @@ import "./globals.css";
 import WalletConnector from "@/components/walletConnector";
 import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/header";
+import { ContactProvider } from "@/context/ContactContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +33,10 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <WalletConnector>
-            <Header />
-            {children}
+            <ContactProvider>
+              <Header />
+              {children}
+            </ContactProvider>
           </WalletConnector>
         </body>
       </html>
