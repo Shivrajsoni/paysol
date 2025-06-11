@@ -42,7 +42,8 @@ const GetAllContactPage = () => {
         const error = await response.json();
         throw new Error(error.error || "Search failed");
       }
-      return response.json();
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     },
   });
 
@@ -55,9 +56,10 @@ const GetAllContactPage = () => {
           `/api/users/allContactFetch?clerkId=${userId}`
         );
         const data = await response.json();
-        setAllContacts(data);
+        setAllContacts(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching contacts:", error);
+        setAllContacts([]);
       } finally {
         setIsLoading(false);
       }
@@ -84,8 +86,14 @@ const GetAllContactPage = () => {
     router.push("/");
   };
 
-  // Display search results if there's a search query, otherwise show all contacts
-  const displayContacts = searchQuery ? searchResults : allContacts;
+  // Ensure displayContacts is always an array
+  const displayContacts = Array.isArray(
+    searchQuery ? searchResults : allContacts
+  )
+    ? searchQuery
+      ? searchResults
+      : allContacts
+    : [];
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4">

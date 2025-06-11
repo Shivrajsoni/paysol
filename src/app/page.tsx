@@ -2,17 +2,17 @@ import Card02 from "@/@/components/xui/card-02";
 import ContactAddition from "@/components/ContactAddition";
 import GetAllContactPage from "@/components/GetAllContactPage";
 import RecentTransactionPage from "@/components/RecentTransactionPage";
-import SearchContacts from "@/components/SearchContacts";
+
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
+    <main className="min-h-screen bg-gradient-to-r  from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-800">
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 mb-3">
-            Solana Pay
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-slate-600 dark:from-gray-400 dark:to-slate-400 mb-3">
+            Pay to the Known One's
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
             Send payments securely and instantly using Solana blockchain only to
