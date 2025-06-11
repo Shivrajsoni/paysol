@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import RequestPayment from "./RequestPayment";
 import PendingPayment from "./PendingPayment";
