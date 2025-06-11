@@ -50,18 +50,19 @@ export default function PaymentCard() {
     }
   }, [selectedContact]);
 
-  const handleSendSol = useCallback(async () => {
+  const handleSendSol = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!publicKey || !sendTransaction) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
+    if (!receiverPubkey || !amount) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
     try {
-      if (!publicKey || !sendTransaction) {
-        toast.error("Please connect your wallet first");
-        return;
-      }
-
-      if (!receiverPubkey || !amount) {
-        toast.error("Please fill in all fields");
-        return;
-      }
-
       setIsLoading(true);
 
       // Validate receiver public key
@@ -94,10 +95,7 @@ export default function PaymentCard() {
         await connection.getLatestBlockhash();
 
       // Create transaction
-      const transaction = new Transaction();
-
-      // Add transfer instruction
-      transaction.add(
+      const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: receiverPublicKey,
@@ -105,66 +103,65 @@ export default function PaymentCard() {
         })
       );
 
-      // Set transaction properties
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
+      // Send transaction to wallet for signing
+      const signature = await sendTransaction(transaction, connection);
+
+      // Wait for confirmation
+      const status = await connection.confirmTransaction({
+        signature,
+        blockhash,
+        lastValidBlockHeight,
+      });
+
+      if (status.value.err) {
+        throw new Error("Transaction failed");
+      }
+
+      // Store transaction in database
       try {
-        // Send transaction to wallet for signing
-        const signature = await sendTransaction(transaction, connection);
-
-        // Wait for confirmation
-        const status = await connection.confirmTransaction({
-          signature,
-          blockhash,
-          lastValidBlockHeight,
-        });
-
-        if (status.value.err) {
-          throw new Error("Transaction failed");
-        }
-
-        // Update payment status in database
-        const updateResponse = await fetch("/api/payment/update", {
+        const response = await fetch("/api/transaction/store", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            recipientPublicKey: publicKey.toString(),
-            senderPublicKey: receiverPubkey,
-            amount: amount,
+            signature,
+            from: publicKey.toString(),
+            to: receiverPubkey,
+            amount: amount.toString(),
           }),
         });
 
-        if (!updateResponse.ok) {
-          console.error("Failed to update payment status");
+        if (!response.ok) {
+          console.error("Failed to store transaction:", await response.text());
         }
-
-        toast.success("Transaction successful!");
-        setReceiverPubkey("");
-        setAmount("");
       } catch (error) {
-        console.error("Transaction failed:", error);
-        if (error instanceof Error) {
-          if (error.message.includes("user rejected")) {
-            toast.error("Transaction was rejected by user");
-          } else if (error.message.includes("invalid account")) {
-            toast.error("Invalid transaction. Please try again.");
-          } else {
-            toast.error(error.message);
-          }
-        } else {
-          toast.error("Transaction failed. Please try again.");
-        }
+        console.error("Error storing transaction:", error);
       }
+
+      toast.success("Payment sent successfully!");
+      setAmount("");
+      setReceiverPubkey("");
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(error instanceof Error ? error.message : "An error occurred");
+      console.error("Error sending payment:", error);
+      if (error instanceof Error) {
+        if (error.message.includes("user rejected")) {
+          toast.error("Transaction was rejected by user");
+        } else if (error.message.includes("invalid account")) {
+          toast.error("Invalid transaction. Please try again.");
+        } else {
+          toast.error(error.message);
+        }
+      } else {
+        toast.error("Failed to send payment. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [publicKey, receiverPubkey, amount, connection, sendTransaction]);
+  };
 
   return (
     <div className="w-full max-w-xs mx-auto">
