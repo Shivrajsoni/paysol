@@ -23,10 +23,14 @@ model Contacts {
 model User {
   id        String      @id @default(uuid())
   username  String?     
-  PublicKey String?
+  PublicKey String?     
   clerkId   String?     @unique
   transactions Transaction[]  @relation("UserToTransactions")
   contacts Contacts[]  @relation("UserToContacts")
+  // Payment requests created by this user
+  sentPayments Payment_Pending[] @relation("PaymentSender")
+
+  @@index([PublicKey])
 }
 
 model Transaction {
@@ -39,3 +43,20 @@ model Transaction {
   userId String
 }
 
+model Payment_Pending {
+  id String @id @default(uuid())
+  description String 
+  amount String
+  is_completed Boolean @default(false)
+  createdAt DateTime @default(now())
+  
+  // The user who created the payment request
+  sender User @relation("PaymentSender", fields: [senderId], references: [id])
+  senderId String
+  
+  // The recipient's public key (no need for recipient ID)
+  recipientPublicKey String
+
+  @@index([senderId])
+  @@index([recipientPublicKey])
+}

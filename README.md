@@ -36,6 +36,7 @@
       - error in all contact section it showing contact to evryone , making logic correct - done
     - also add search option in contact for searching on the base of username - done
     - a toaster message should pop out for payment status
+    - add case like not more payment request than 10 in a day , and like a cross button for payment request cancellation also user must know about it , making more things in user payment request by showing toaster on everything
 
   Future Plans :
   A group Payment Mechanism

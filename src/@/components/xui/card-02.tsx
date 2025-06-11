@@ -13,16 +13,33 @@ import {
 } from "@solana/web3.js";
 import { toast } from "sonner";
 import { useContact } from "@/context/ContactContext";
+import { usePayment } from "@/context/PaymentContext";
 
 export default function PaymentCard() {
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
   const { selectedContact } = useContact();
+  const { paymentDetails, setPaymentDetails } = usePayment();
   const [receiverPubkey, setReceiverPubkey] = useState<string>("");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const amountInputRef = useRef<HTMLInputElement>(null);
 
+  // Handle payment details from context
+  useEffect(() => {
+    if (paymentDetails) {
+      setReceiverPubkey(paymentDetails.recipientPublicKey);
+      setAmount(paymentDetails.amount);
+      // Focus on amount input after a short delay
+      setTimeout(() => {
+        amountInputRef.current?.focus();
+      }, 500);
+      // Clear the context after using it
+      setPaymentDetails(null);
+    }
+  }, [paymentDetails, setPaymentDetails]);
+
+  // Handle selected contact
   useEffect(() => {
     if (selectedContact) {
       setReceiverPubkey(selectedContact.publicKey);
@@ -105,6 +122,23 @@ export default function PaymentCard() {
 
         if (status.value.err) {
           throw new Error("Transaction failed");
+        }
+
+        // Update payment status in database
+        const updateResponse = await fetch("/api/payment/update", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            recipientPublicKey: publicKey.toString(),
+            senderPublicKey: receiverPubkey,
+            amount: amount,
+          }),
+        });
+
+        if (!updateResponse.ok) {
+          console.error("Failed to update payment status");
         }
 
         toast.success("Transaction successful!");
@@ -212,46 +246,41 @@ export default function PaymentCard() {
                   "bg-zinc-50 dark:bg-zinc-800/50",
                   "border-zinc-200 dark:border-zinc-700",
                   "focus:border-zinc-300 dark:focus:border-zinc-600",
-                  "text-zinc-900 dark:text-zinc-100",
-                  "transition-all duration-300",
-                  "group-hover:shadow-lg group-hover:shadow-zinc-200/20 dark:group-hover:shadow-zinc-900/20",
-                  "group-hover:scale-[1.02]",
-                  "group-hover:border-zinc-300/50 dark:group-hover:border-zinc-700/50"
+                  "text-zinc-900 dark:text-zinc-100"
                 )}
                 disabled={!publicKey || isLoading}
               />
-              <div className="absolute inset-0 rounded-md pointer-events-none bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer" />
             </div>
-          </div>
-        </div>
 
-        <div className="px-5 pb-5 flex gap-2 items-center">
-          <Button
-            variant="default"
-            size="sm"
-            className={cn(
-              "w-full",
-              "bg-zinc-900 dark:bg-zinc-100",
-              "hover:bg-zinc-700 dark:hover:bg-zinc-300",
-              "text-white dark:text-zinc-900",
-              "shadow-xs",
-              isLoading && "opacity-50 cursor-not-allowed"
-            )}
-            onClick={handleSendSol}
-            disabled={!publicKey || isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                Processing...
-              </div>
-            ) : (
-              <>
-                <Send className="w-4 h-4 mr-2" />
-                Pay Now
-              </>
-            )}
-          </Button>
+            <Button
+              onClick={handleSendSol}
+              disabled={!publicKey || isLoading}
+              className={cn(
+                "w-full",
+                "bg-gradient-to-r from-zinc-900 to-zinc-800",
+                "hover:from-zinc-800 hover:to-zinc-700",
+                "text-white",
+                "py-6",
+                "rounded-xl",
+                "transition-all duration-200",
+                "hover:scale-[1.02]",
+                "active:scale-[0.98]",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <Send className="w-4 h-4" />
+                  Send Payment
+                </div>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
