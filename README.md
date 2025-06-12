@@ -43,8 +43,12 @@
   - Multi Payment System When Amount is Fixed by having check button in contact page
   - Making Wallet Multibutton design Good
   - Making UI more Annimation and Premium
-  - How can i add Confirm Payment Option in it ? also think means taking some Extra charge and confirming the Payment
+  - How can i add Confirm Payment Option in it ? also think means taking some Extra charge and confirming the Payment - done
   - Make User a Great Experience on Succesfull Payment
+
+    - Problems :
+    - 1 Why Priority fees is 0 ? - fixed
+    - 2 Why UI stuck when we pass the submit a contact creation details
 
   Future Plans :
   A group Payment Mechanism
@@ -52,6 +56,7 @@
   - where user can add people and form group , a common account will be created to the group and
   - then can deposit fund their and after that suppose anybody can purchase from that group account by multisignature of the users in the group
   - Make it Fully Animated and Responsive - at last
+  - Reducing the api call , its too much (For Productinizing)
 
 ### Questions :
 

@@ -10,6 +10,7 @@ import {
   SystemProgram,
   Transaction,
   LAMPORTS_PER_SOL,
+  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import { toast } from "sonner";
 import { useContact } from "@/context/ContactContext";
@@ -23,6 +24,8 @@ export default function PaymentCard() {
   const [receiverPubkey, setReceiverPubkey] = useState<string>("");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isPriority, setIsPriority] = useState(false);
+
   const amountInputRef = useRef<HTMLInputElement>(null);
 
   // Handle payment details from context
@@ -103,6 +106,64 @@ export default function PaymentCard() {
         })
       );
 
+      // Add priority fee if selected
+      if (isPriority) {
+        // Get recent priority fee
+        const priorityFee = await connection.getRecentPrioritizationFees();
+        console.log("Raw priority fees:", priorityFee);
+
+        if (priorityFee && priorityFee.length > 0) {
+          // Sort fees in ascending order
+          const sortedFees = priorityFee
+            .map((fee) => fee.prioritizationFee)
+            .sort((a, b) => a - b);
+
+          console.log("Sorted fees:", sortedFees);
+
+          // Calculate median
+          let medianFee;
+          const mid = Math.floor(sortedFees.length / 2);
+
+          if (sortedFees.length % 2 === 0) {
+            // If even number of fees, take average of two middle values
+            medianFee = (sortedFees[mid - 1] + sortedFees[mid]) / 2;
+          } else {
+            // If odd number of fees, take middle value
+            medianFee = sortedFees[mid];
+          }
+
+          console.log("Median fee:", medianFee);
+
+          // Ensure minimum priority fee (e.g., 1000 micro-lamports)
+          const minimumFee = 1000;
+          const finalFee = Math.max(medianFee, minimumFee);
+
+          console.log("Final priority fee:", finalFee);
+
+          // Add compute budget instruction to set priority fee
+          const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitPrice({
+            microLamports: finalFee,
+          });
+          transaction.add(modifyComputeUnits);
+
+          // Show priority fee info to user
+          toast.info(
+            `Priority fee added: ${finalFee} micro-lamports per compute unit`
+          );
+        } else {
+          console.log("No priority fees available, using default minimum");
+          // Use a default minimum fee if no recent fees are available
+          const defaultFee = 1000;
+          const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitPrice({
+            microLamports: defaultFee,
+          });
+          transaction.add(modifyComputeUnits);
+          toast.info(
+            `Default priority fee added: ${defaultFee} micro-lamports per compute unit`
+          );
+        }
+      }
+
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
@@ -132,6 +193,7 @@ export default function PaymentCard() {
             from: publicKey.toString(),
             to: receiverPubkey,
             amount: amount.toString(),
+            priorityFee: isPriority ? "enabled" : "disabled",
           }),
         });
 
@@ -247,6 +309,23 @@ export default function PaymentCard() {
                 )}
                 disabled={!publicKey || isLoading}
               />
+            </div>
+
+            <div className="flex items-center space-x-2 mt-2">
+              <input
+                type="checkbox"
+                id="priorityFee"
+                checked={isPriority}
+                onChange={(e) => setIsPriority(e.target.checked)}
+                className="h-4 w-4 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 rounded focus:ring-zinc-500"
+                disabled={!publicKey || isLoading}
+              />
+              <label
+                htmlFor="priorityFee"
+                className="text-sm text-zinc-600 dark:text-zinc-400"
+              >
+                Add priority fee for faster transaction confirmation
+              </label>
             </div>
 
             <Button

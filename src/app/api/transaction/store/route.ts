@@ -7,6 +7,7 @@ interface TransactionRequest {
   from: string;
   to: string;
   amount: string;
+  priorityFee?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body: TransactionRequest = await req.json();
-    const { signature, from, to, amount } = body;
+    const { signature, from, to, amount, priorityFee } = body;
 
     if (!signature || !from || !to || !amount) {
       return NextResponse.json(
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
         from,
         to,
         amount,
+        priorityFee: priorityFee || "disabled", // Default to disabled if not provided
         userId: dbUser.id,
       },
     });
