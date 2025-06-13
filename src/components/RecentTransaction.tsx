@@ -55,7 +55,7 @@ const RecentTransaction = () => {
 
     try {
       const signatures = await connection.getSignaturesForAddress(publicKey, {
-        limit: 5,
+        limit: 10,
       });
 
       const transactionDetails = await Promise.all(
@@ -257,7 +257,7 @@ const RecentTransaction = () => {
                 <div>Signature</div>
               </div>
               <div className="divide-y divide-zinc-200/50 dark:divide-zinc-800/50 max-h-[180px] overflow-y-auto">
-                {recentTransactions.slice(0, 3).map((tx) => (
+                {recentTransactions.slice(0, 6).map((tx) => (
                   <div
                     key={tx.signature}
                     className="grid grid-cols-6 gap-3 p-3 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50 transition-colors text-sm"

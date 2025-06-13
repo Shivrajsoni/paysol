@@ -25,8 +25,31 @@ export default function PaymentCard() {
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isPriority, setIsPriority] = useState(false);
+  const [transactionStatus, setTransactionStatus] = useState<{
+    status:
+      | "idle"
+      | "processing"
+      | "confirming"
+      | "storing"
+      | "success"
+      | "error";
+    message: string;
+  }>({ status: "idle", message: "" });
 
   const amountInputRef = useRef<HTMLInputElement>(null);
+
+  // Reset transaction status after 5 seconds of success/error
+  useEffect(() => {
+    if (
+      transactionStatus.status === "success" ||
+      transactionStatus.status === "error"
+    ) {
+      const timer = setTimeout(() => {
+        setTransactionStatus({ status: "idle", message: "" });
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [transactionStatus.status]);
 
   // Handle payment details from context
   useEffect(() => {
@@ -67,6 +90,10 @@ export default function PaymentCard() {
 
     try {
       setIsLoading(true);
+      setTransactionStatus({
+        status: "processing",
+        message: "Preparing transaction...",
+      });
 
       // Validate receiver public key
       let receiverPublicKey;
@@ -74,6 +101,10 @@ export default function PaymentCard() {
         receiverPublicKey = new PublicKey(receiverPubkey);
       } catch (error) {
         toast.error("Invalid receiver public key");
+        setTransactionStatus({
+          status: "error",
+          message: "Invalid receiver address",
+        });
         return;
       }
 
@@ -81,6 +112,7 @@ export default function PaymentCard() {
       const transferAmount = Number(amount);
       if (isNaN(transferAmount) || transferAmount <= 0) {
         toast.error("Please enter a valid amount");
+        setTransactionStatus({ status: "error", message: "Invalid amount" });
         return;
       }
 
@@ -90,8 +122,17 @@ export default function PaymentCard() {
       const balance = await connection.getBalance(publicKey);
       if (balance < lamports) {
         toast.error("Insufficient balance");
+        setTransactionStatus({
+          status: "error",
+          message: "Insufficient balance",
+        });
         return;
       }
+
+      setTransactionStatus({
+        status: "processing",
+        message: "Creating transaction...",
+      });
 
       // Get latest blockhash
       const { blockhash, lastValidBlockHeight } =
@@ -108,6 +149,10 @@ export default function PaymentCard() {
 
       // Add priority fee if selected
       if (isPriority) {
+        setTransactionStatus({
+          status: "processing",
+          message: "Calculating priority fee...",
+        });
         // Get recent priority fee
         const priorityFee = await connection.getRecentPrioritizationFees();
         console.log("Raw priority fees:", priorityFee);
@@ -167,8 +212,18 @@ export default function PaymentCard() {
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
+      setTransactionStatus({
+        status: "confirming",
+        message: "Waiting for wallet confirmation...",
+      });
+
       // Send transaction to wallet for signing
       const signature = await sendTransaction(transaction, connection);
+
+      setTransactionStatus({
+        status: "confirming",
+        message: "Confirming transaction...",
+      });
 
       // Wait for confirmation
       const status = await connection.confirmTransaction({
@@ -180,6 +235,11 @@ export default function PaymentCard() {
       if (status.value.err) {
         throw new Error("Transaction failed");
       }
+
+      setTransactionStatus({
+        status: "storing",
+        message: "Storing transaction details...",
+      });
 
       // Store transaction in database
       try {
@@ -204,6 +264,10 @@ export default function PaymentCard() {
         console.error("Error storing transaction:", error);
       }
 
+      setTransactionStatus({
+        status: "success",
+        message: "Payment sent successfully!",
+      });
       toast.success("Payment sent successfully!");
       setAmount("");
       setReceiverPubkey("");
@@ -212,13 +276,26 @@ export default function PaymentCard() {
       if (error instanceof Error) {
         if (error.message.includes("user rejected")) {
           toast.error("Transaction was rejected by user");
+          setTransactionStatus({
+            status: "error",
+            message: "Transaction rejected",
+          });
         } else if (error.message.includes("invalid account")) {
           toast.error("Invalid transaction. Please try again.");
+          setTransactionStatus({
+            status: "error",
+            message: "Invalid transaction",
+          });
         } else {
           toast.error(error.message);
+          setTransactionStatus({ status: "error", message: error.message });
         }
       } else {
         toast.error("Failed to send payment. Please try again.");
+        setTransactionStatus({
+          status: "error",
+          message: "Transaction failed",
+        });
       }
     } finally {
       setIsLoading(false);
@@ -341,13 +418,51 @@ export default function PaymentCard() {
                 "transition-all duration-200",
                 "hover:scale-[1.02]",
                 "active:scale-[0.98]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                "disabled:opacity-50 disabled:cursor-not-allowed",
+                transactionStatus.status === "success" &&
+                  "bg-green-600 hover:bg-green-700",
+                transactionStatus.status === "error" &&
+                  "bg-red-600 hover:bg-red-700"
               )}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Processing...
+                  {transactionStatus.message}
+                </div>
+              ) : transactionStatus.status === "success" ? (
+                <div className="flex items-center justify-center gap-2">
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  {transactionStatus.message}
+                </div>
+              ) : transactionStatus.status === "error" ? (
+                <div className="flex items-center justify-center gap-2">
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                  {transactionStatus.message}
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-2">
