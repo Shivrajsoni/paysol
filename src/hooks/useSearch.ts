@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import useDebounce from "./useDebounce";
 
 interface UseSearchOptions<T> {
@@ -18,6 +19,7 @@ export function useSearch<T>({
   const [error, setError] = useState<string | null>(null);
   const [searchCount, setSearchCount] = useState(0);
   const [lastSuccessfulQuery, setLastSuccessfulQuery] = useState("");
+  const { toast } = useToast();
 
   const debouncedQuery = useDebounce(searchQuery, debounceDelay);
 
@@ -47,14 +49,28 @@ export function useSearch<T>({
         setSearchResults(results);
         setLastSuccessfulQuery(query);
         setSearchCount((prev) => prev + 1);
+        if (results.length === 0) {
+          toast({
+            variant: "info",
+            title: "No Results Found",
+            description: "Try searching with different keywords.",
+          });
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        const errorMessage =
+          err instanceof Error ? err.message : "Search failed";
+        setError(errorMessage);
+        toast({
+          variant: "destructive",
+          title: "Search Error",
+          description: errorMessage,
+        });
         setSearchResults([]);
       } finally {
         setIsSearching(false);
       }
     },
-    [minSearchLength, onSearch, lastSuccessfulQuery, searchCount]
+    [minSearchLength, onSearch, lastSuccessfulQuery, searchCount, toast]
   );
 
   useEffect(() => {

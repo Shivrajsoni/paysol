@@ -5,7 +5,7 @@ import WalletConnector from "@/components/walletConnector";
 import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/header";
 import { ContactProvider } from "@/context/ContactContext";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { PaymentProvider } from "@/context/PaymentContext";
 import Provider from "./Provider";
 
@@ -36,6 +36,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Provider>{children}</Provider>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

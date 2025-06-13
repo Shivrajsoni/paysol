@@ -50,8 +50,10 @@
 
   - Made Dark Mode Compatible - done
   - Added some improvemnet in design and more alignment - done
-  -
-  -
+  - Make all Components more animation (framer)
+  - fix walletMultbutton
+  - Improving toast Messages - done
+
   - - Problems :
     - 1 Why Priority fees is 0 ? - fixed
     - 2 Why UI stuck when we pass the submit a contact creation details -fixed
