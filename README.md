@@ -46,7 +46,13 @@
   - How can i add Confirm Payment Option in it ? also think means taking some Extra charge and confirming the Payment - done
   - Make User a Great Experience on Succesfull Payment- done
 
-    - Problems :
+  Day - 04
+
+  - Made Dark Mode Compatible - done
+  - Added some improvemnet in design and more alignment - done
+  -
+  -
+  - - Problems :
     - 1 Why Priority fees is 0 ? - fixed
     - 2 Why UI stuck when we pass the submit a contact creation details -fixed
 

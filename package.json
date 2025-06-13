@@ -11,6 +11,7 @@
   "dependencies": {
     "@clerk/nextjs": "^6.21.0",
     "@prisma/client": "^6.9.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-slot": "^1.2.3",
     "@solana-program/system": "^0.7.0",
     "@solana/wallet-adapter-base": "^0.9.26",
@@ -23,6 +24,7 @@
     "lucide-react": "^0.513.0",
     "motion": "^12.16.0",
     "next": "15.3.3",
+    "next-themes": "^0.4.6",
     "prisma": "^6.9.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

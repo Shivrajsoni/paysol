@@ -7,6 +7,7 @@ import Header from "@/components/header";
 import { ContactProvider } from "@/context/ContactContext";
 import { Toaster } from "sonner";
 import { PaymentProvider } from "@/context/PaymentContext";
+import Provider from "./Provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,15 +35,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <PaymentProvider>
-            <WalletConnector>
-              <ContactProvider>
-                <Header />
-                {children}
-              </ContactProvider>
-            </WalletConnector>
-            <Toaster />
-          </PaymentProvider>
+          <Provider>{children}</Provider>
         </body>
       </html>
     </ClerkProvider>
