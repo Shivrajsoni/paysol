@@ -16,6 +16,8 @@ import {
   Snowflake,
   PlusCircle,
   Clock,
+  Shield,
+  Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import WalletButton from "./ui/WalletButton";
@@ -103,7 +105,7 @@ const Header = () => {
                 className="flex items-center gap-2 group transition-all duration-200 hover:scale-[1.02]"
               >
                 <motion.div
-                  className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 flex items-center justify-center shadow-md relative overflow-hidden"
+                  className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 flex items-center justify-center shadow-md overflow-hidden"
                   animate={{
                     boxShadow: [
                       "0 0 0px 0px #60a5fa",
@@ -118,17 +120,20 @@ const Header = () => {
                   }}
                 >
                   <span className="absolute inset-0 z-0 shimmer" />
-                  <Snowflake className="w-4 h-4 text-white relative z-10" />
+                  <div className="relative z-10 flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-white" />
+                    <Send className="w-2 h-2 text-white absolute -bottom-0.5 -right-0.5" />
+                  </div>
                 </motion.div>
                 <span className="font-bold text-xl bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 bg-clip-text text-transparent tracking-tight">
-                  XpaY
+                  Erite
                 </span>
               </Link>
               <div className="h-5 w-px bg-gradient-to-b from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-600" />
             </div>
 
             {/* Navigation and Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {/* Payment Request Button */}
               <Link
                 href="/payment-request"
@@ -143,7 +148,8 @@ const Header = () => {
                   "shadow-sm shadow-blue-500/10",
                   "hover:shadow-md hover:shadow-blue-500/20",
                   "hover:scale-[1.02]",
-                  "active:scale-[0.98]"
+                  "active:scale-[0.98]",
+                  "h-8"
                 )}
               >
                 <PlusCircle className="w-3.5 h-3.5" />
@@ -155,8 +161,8 @@ const Header = () => {
                 href="/pending-requests"
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-1.5",
-                  "bg-white/50 dark:bg-zinc-800/50",
-                  "hover:bg-white/70 dark:hover:bg-zinc-800/70",
+                  "bg-gradient-to-r from-zinc-100 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900",
+                  "hover:from-zinc-200 hover:to-zinc-100 dark:hover:from-zinc-700 dark:hover:to-zinc-800",
                   "text-zinc-900 dark:text-zinc-100",
                   "rounded-lg",
                   "transition-all duration-200",
@@ -164,7 +170,8 @@ const Header = () => {
                   "shadow-sm shadow-zinc-200/10 dark:shadow-zinc-900/10",
                   "hover:shadow-md hover:shadow-zinc-200/20 dark:hover:shadow-zinc-900/20",
                   "hover:scale-[1.02]",
-                  "active:scale-[0.98]"
+                  "active:scale-[0.98]",
+                  "h-8"
                 )}
               >
                 <Clock className="w-3.5 h-3.5" />
@@ -177,7 +184,7 @@ const Header = () => {
               <ModeToggle />
 
               {/* User Account */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <SignedOut>
                   <SignInButton mode="modal">
                     <button
@@ -192,7 +199,8 @@ const Header = () => {
                         "shadow-sm shadow-zinc-900/10 dark:shadow-zinc-100/10",
                         "hover:shadow-md hover:shadow-zinc-900/20 dark:hover:shadow-zinc-100/20",
                         "hover:scale-[1.02]",
-                        "active:scale-[0.98]"
+                        "active:scale-[0.98]",
+                        "h-8"
                       )}
                     >
                       Sign In

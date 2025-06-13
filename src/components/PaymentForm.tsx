@@ -5,7 +5,7 @@ import { usePayment } from "@/context/PaymentContext";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Users, ArrowRight } from "lucide-react";
 
 export default function PaymentForm() {
   const { selectedContact } = useContact();
@@ -23,7 +23,6 @@ export default function PaymentForm() {
     try {
       await sendPayment(selectedContact.publicKey, parseFloat(amount));
 
-      // Enhanced success toast
       toast({
         variant: "success",
         //@ts-ignore
@@ -47,14 +46,13 @@ export default function PaymentForm() {
             </div>
           </div>
         ),
-        duration: 5000, // Show for 5 seconds
+        duration: 5000,
       });
 
       setAmount("");
     } catch (error) {
       console.error("Payment error:", error);
 
-      // Enhanced error toast
       toast({
         variant: "destructive",
         //@ts-ignore
@@ -85,10 +83,23 @@ export default function PaymentForm() {
 
   if (!selectedContact) {
     return (
-      <div className="text-center py-8">
-        <p className="text-zinc-500 dark:text-zinc-400">
-          Please select a contact to make a payment
-        </p>
+      <div className="flex flex-col items-center justify-center py-12 px-4 text-center space-y-4 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800">
+        <div className="p-3 rounded-full bg-zinc-100 dark:bg-zinc-800">
+          <Users className="h-8 w-8 text-zinc-600 dark:text-zinc-400" />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Quick & Easy Payments
+          </h3>
+          <p className="text-zinc-500 dark:text-zinc-400 max-w-sm">
+            Select a contact from your list to start sending SOL instantly. Your
+            trusted network is just a click away.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <span>Choose a contact</span>
+          <ArrowRight className="h-4 w-4" />
+        </div>
       </div>
     );
   }
