@@ -100,10 +100,6 @@ const PaymentRequest = () => {
             Create Payment Request
           </h1>
 
-          <p className="text-sm text-gray-500">
-            Let&apos;s get started with your first payment request!
-          </p>
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label
