@@ -6,12 +6,16 @@ import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
 const TOAST_LIMIT = 5;
 const TOAST_REMOVE_DELAY = 1000000;
 
-type ToasterToast = Omit<ToastProps, "id"> & {
+export type ToasterToast = ToastProps & {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: ToastActionElement;
 };
+
+export type Toast = Omit<ToasterToast, "id">;
+
+export type ToastActionType = (typeof actionTypes)[keyof typeof actionTypes];
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -134,8 +138,6 @@ function dispatch(action: Action) {
     listener(memoryState);
   });
 }
-
-type Toast = Omit<ToasterToast, "id">;
 
 function toast({ ...props }: Toast) {
   const id = genId();

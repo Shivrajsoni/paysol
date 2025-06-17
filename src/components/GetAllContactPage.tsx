@@ -12,7 +12,7 @@ import {
   UserMinus,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useContact } from "@/context/ContactContext";
@@ -80,7 +80,7 @@ const GetAllContactPage = () => {
         if (Array.isArray(data) && data.length > 0) {
           toast({
             variant: "info",
-            //@ts-ignore
+            //@ts-expect-error - Type definition for toast title
             title: (
               <div className="flex items-center gap-2">
                 <UserPlus className="h-5 w-5 text-blue-500" />
@@ -98,7 +98,7 @@ const GetAllContactPage = () => {
         setAllContacts([]);
         toast({
           variant: "destructive",
-          //@ts-ignore
+          //@ts-expect-error - Type definition for toast title
           title: (
             <div className="flex items-center gap-2">
               <UserMinus className="h-5 w-5 text-red-500" />
@@ -131,7 +131,7 @@ const GetAllContactPage = () => {
     });
     toast({
       variant: "success",
-      //@ts-ignore
+      //@ts-expect-error - Type definition for toast title
       title: (
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-5 w-5 text-green-500" />

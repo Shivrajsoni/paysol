@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL") // Used for direct connections
 }
 
 model Contacts {
@@ -57,10 +58,12 @@ model Payment_Pending {
   // The user who created the payment request
   sender   User   @relation("PaymentSender", fields: [senderId], references: [id])
   senderId String
+  senderPublicKey String?
 
   // The recipient's public key (no need for recipient ID)
   recipientPublicKey String
 
   @@index([senderId])
   @@index([recipientPublicKey])
+  @@index([senderPublicKey])
 }

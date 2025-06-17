@@ -1,56 +1,59 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { Prisma } from "../../../../../prisma";
 import { auth } from "@clerk/nextjs/server";
-
-interface RequestProps {
-  requestedPublicKey: string;
-  amount: string;
-  description: string;
-  senderId: string;
-}
+import { paymentRequestSchema, validateRequest } from "@/lib/validation";
+import { ApiError, handleApiError } from "@/lib/api-error";
+import {
+  successResponse,
+  errorResponse,
+  unauthorizedResponse,
+} from "@/lib/api-response";
+import { setCachedUsername } from "@/lib/redis";
 
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
     const session = await auth();
     if (!session?.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     // Parse and validate request body
     const body = await request.json();
-    const { requestedPublicKey, amount, description, senderId }: RequestProps =
-      body;
+    const validation = await validateRequest(paymentRequestSchema, body);
 
-    // Validate required fields
-    if (!requestedPublicKey || !amount || !senderId) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    if (!validation.success) {
+      return errorResponse(validation.error);
     }
 
-    // Validate amount is a positive number
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
-    }
+    const { requestedPublicKey, amount, description, senderId } =
+      validation.data;
 
     // Find the sender user
     const sender = await Prisma.user.findFirst({
       where: {
         clerkId: senderId,
       },
+      select: {
+        id: true,
+        PublicKey: true,
+        username: true,
+      },
     });
 
     if (!sender) {
-      return NextResponse.json({ error: "Sender not found" }, { status: 404 });
+      throw ApiError.notFound("Sender not found");
+    }
+
+    if (!sender.PublicKey) {
+      throw ApiError.badRequest("Sender's public key not found");
     }
 
     // Create payment request
     const paymentRequest = await Prisma.payment_Pending.create({
       data: {
         senderId: sender.id,
+        senderPublicKey: sender.PublicKey,
         recipientPublicKey: requestedPublicKey,
         description: description || "",
         amount: amount,
@@ -58,18 +61,24 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
+    // Cache the sender's username for future lookups
+    if (sender.username) {
+      await setCachedUsername(sender.PublicKey, sender.username);
+    }
+
+    return successResponse(
       {
-        message: "Payment request created successfully",
-        data: paymentRequest,
+        ...paymentRequest,
+        sender: {
+          username: sender.username,
+          PublicKey: sender.PublicKey,
+        },
       },
-      { status: 201 }
+      "Payment request created successfully",
+      201
     );
   } catch (error) {
-    console.error("Error creating payment request:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const { statusCode, message } = handleApiError(error);
+    return errorResponse(message, statusCode);
   }
 }

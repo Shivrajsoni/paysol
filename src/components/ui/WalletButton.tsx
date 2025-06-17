@@ -2,7 +2,6 @@
 
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { cn } from "@/lib/utils";
-import { Wallet } from "lucide-react";
 
 interface WalletButtonProps {
   className?: string;

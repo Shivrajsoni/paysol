@@ -10,19 +10,11 @@ import {
 } from "@clerk/nextjs";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  PartyPopper,
-  Snowflake,
-  PlusCircle,
-  Clock,
-  Shield,
-  Send,
-} from "lucide-react";
+import { PlusCircle, Clock, Shield, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import WalletButton from "./ui/WalletButton";
 import { ModeToggle } from "./ThemeToggleButton";
-import { motion, useScroll, useMotionValue, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const Header = () => {
   const { userId } = useAuth();
@@ -62,7 +54,7 @@ const Header = () => {
       }
     };
     syncUserData();
-  }, [userId, publicKey]);
+  }, [userId, publicKey, isSynced]);
 
   return (
     <motion.header
@@ -79,11 +71,16 @@ const Header = () => {
       {/* Main header container */}
       <div className="relative w-full">
         {/* Background with gradient and blur */}
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-50/95 via-zinc-50/95 to-zinc-100/95 dark:from-zinc-900/95 dark:via-zinc-900/95 dark:to-zinc-800/95 backdrop-blur-md" />
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-br from-zinc-50/95 via-zinc-50/95 to-zinc-100/95 dark:from-zinc-900/95 dark:via-zinc-900/95 dark:to-zinc-800/95 backdrop-blur-md"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        />
 
         {/* Content container */}
         <div className="relative w-full">
-          <div
+          <motion.div
             className={cn(
               "flex items-center justify-between",
               "bg-white/20 dark:bg-zinc-900/20",
@@ -97,9 +94,17 @@ const Header = () => {
               "shadow-sm",
               "ring-1 ring-zinc-200/20 dark:ring-zinc-800/20"
             )}
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
           >
             {/* Logo and Brand */}
-            <div className="flex items-center gap-4">
+            <motion.div
+              className="flex items-center gap-4"
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               <Link
                 href="/"
                 className="flex items-center gap-2 group transition-all duration-200 hover:scale-[1.02]"
@@ -118,6 +123,8 @@ const Header = () => {
                     duration: 3,
                     ease: "easeInOut",
                   }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <span className="absolute inset-0 z-0 shimmer" />
                   <div className="relative z-10 flex items-center justify-center">
@@ -125,66 +132,101 @@ const Header = () => {
                     <Send className="w-2 h-2 text-white absolute -bottom-0.5 -right-0.5" />
                   </div>
                 </motion.div>
-                <span className="font-bold text-xl bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 bg-clip-text text-transparent tracking-tight">
+                <motion.span
+                  className="font-bold text-xl bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 bg-clip-text text-transparent tracking-tight"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                >
                   Erite
-                </span>
+                </motion.span>
               </Link>
-              <div className="h-5 w-px bg-gradient-to-b from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-600" />
-            </div>
+              <motion.div
+                className="h-5 w-px bg-gradient-to-b from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-600"
+                initial={{ scaleY: 0 }}
+                animate={{ scaleY: 1 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              />
+            </motion.div>
 
             {/* Navigation and Actions */}
-            <div className="flex items-center gap-1.5">
+            <motion.div
+              className="flex items-center gap-1.5"
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               {/* Payment Request Button */}
-              <Link
-                href="/payment-request"
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5",
-                  "bg-gradient-to-r from-blue-500 to-blue-600",
-                  "hover:from-blue-600 hover:to-blue-700",
-                  "text-white",
-                  "rounded-lg",
-                  "transition-all duration-200",
-                  "text-sm font-medium",
-                  "shadow-sm shadow-blue-500/10",
-                  "hover:shadow-md hover:shadow-blue-500/20",
-                  "hover:scale-[1.02]",
-                  "active:scale-[0.98]",
-                  "h-8"
-                )}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <PlusCircle className="w-3.5 h-3.5" />
-                New Payment
-              </Link>
+                <Link
+                  href="/payment-request"
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5",
+                    "bg-gradient-to-r from-blue-500 to-blue-600",
+                    "hover:from-blue-600 hover:to-blue-700",
+                    "text-white",
+                    "rounded-lg",
+                    "transition-all duration-200",
+                    "text-sm font-medium",
+                    "shadow-sm shadow-blue-500/10",
+                    "hover:shadow-md hover:shadow-blue-500/20",
+                    "h-8"
+                  )}
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  New Payment
+                </Link>
+              </motion.div>
 
               {/* Pending Requests Button */}
-              <Link
-                href="/pending-requests"
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5",
-                  "bg-gradient-to-r from-zinc-100 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900",
-                  "hover:from-zinc-200 hover:to-zinc-100 dark:hover:from-zinc-700 dark:hover:to-zinc-800",
-                  "text-zinc-900 dark:text-zinc-100",
-                  "rounded-lg",
-                  "transition-all duration-200",
-                  "text-sm font-medium",
-                  "shadow-sm shadow-zinc-200/10 dark:shadow-zinc-900/10",
-                  "hover:shadow-md hover:shadow-zinc-200/20 dark:hover:shadow-zinc-900/20",
-                  "hover:scale-[1.02]",
-                  "active:scale-[0.98]",
-                  "h-8"
-                )}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <Clock className="w-3.5 h-3.5" />
-                Pending
-              </Link>
+                <Link
+                  href="/pending-requests"
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5",
+                    "bg-gradient-to-r from-zinc-100 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900",
+                    "hover:from-zinc-200 hover:to-zinc-100 dark:hover:from-zinc-700 dark:hover:to-zinc-800",
+                    "text-zinc-900 dark:text-zinc-100",
+                    "rounded-lg",
+                    "transition-all duration-200",
+                    "text-sm font-medium",
+                    "shadow-sm shadow-zinc-200/10 dark:shadow-zinc-900/10",
+                    "hover:shadow-md hover:shadow-zinc-200/20 dark:hover:shadow-zinc-900/20",
+                    "h-8"
+                  )}
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  Pending
+                </Link>
+              </motion.div>
 
               {/* Wallet Connection */}
-              <WalletButton className="!scale-90" />
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <WalletButton className="!scale-90" />
+              </motion.div>
 
-              <ModeToggle />
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <ModeToggle />
+              </motion.div>
 
               {/* User Account */}
-              <div className="flex items-center gap-1.5">
+              <motion.div
+                className="flex items-center gap-1.5"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
                 <SignedOut>
                   <SignInButton mode="modal">
                     <button
@@ -198,8 +240,6 @@ const Header = () => {
                         "text-sm font-medium",
                         "shadow-sm shadow-zinc-900/10 dark:shadow-zinc-100/10",
                         "hover:shadow-md hover:shadow-zinc-900/20 dark:hover:shadow-zinc-100/20",
-                        "hover:scale-[1.02]",
-                        "active:scale-[0.98]",
                         "h-8"
                       )}
                     >
@@ -218,9 +258,9 @@ const Header = () => {
                     }}
                   />
                 </SignedIn>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
 

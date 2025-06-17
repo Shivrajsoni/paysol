@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "../../../../../prisma";
+import { getCachedUsername, setCachedUsername } from "@/lib/redis";
 
 export async function GET(request: Request) {
   try {
@@ -30,7 +31,21 @@ export async function GET(request: Request) {
       );
     }
 
-    // Find the user's database id
+    // First, check Redis cache
+    const cachedUsername = await getCachedUsername(sanitizedQuery);
+    if (cachedUsername) {
+      return NextResponse.json({
+        contacts: [
+          {
+            id: "cached",
+            username: cachedUsername,
+            PublicKey: sanitizedQuery,
+          },
+        ],
+      });
+    }
+
+    // If not in cache, query the database
     const user = await Prisma.user.findFirst({
       where: {
         clerkId: session.userId,
@@ -54,15 +69,17 @@ export async function GET(request: Request) {
       },
     });
 
-    // Return empty array if no contact found
-    if (!contact) {
-      return NextResponse.json({ contacts: [] });
+    // If contact found, cache it and return
+    if (contact) {
+      // Cache the result for future lookups
+      await setCachedUsername(contact.PublicKey, contact.username);
+      return NextResponse.json({
+        contacts: [contact],
+      });
     }
 
-    // Return the contact in the expected format
-    return NextResponse.json({
-      contacts: [contact],
-    });
+    // If no contact found, return empty array
+    return NextResponse.json({ contacts: [] });
   } catch (error) {
     console.error("Search error:", error);
     return NextResponse.json(

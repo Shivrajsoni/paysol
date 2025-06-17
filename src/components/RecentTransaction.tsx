@@ -1,12 +1,11 @@
 "use client";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   PublicKey,
   TransactionResponse,
   VersionedTransactionResponse,
-  Message,
 } from "@solana/web3.js";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +46,7 @@ const RecentTransaction = () => {
     }
   };
 
-  const fetchRecentTransactions = async () => {
+  const fetchRecentTransactions = useCallback(async () => {
     if (!publicKey) return;
 
     setLoading(true);
@@ -103,7 +102,7 @@ const RecentTransaction = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [publicKey, connection]);
 
   const extractRecipient = (
     transaction: TransactionResponse | VersionedTransactionResponse,
@@ -172,7 +171,7 @@ const RecentTransaction = () => {
     if (!pubkey || pubkey === "Unknown") return pubkey;
     const parts = pubkey.split("");
     const firstPart = parts.slice(0, 4).join("");
-    const lastPart = parts.slice(-4).join("");
+
     return `${firstPart}..`;
   };
 
@@ -180,7 +179,7 @@ const RecentTransaction = () => {
     if (publicKey) {
       fetchRecentTransactions();
     }
-  }, [publicKey]);
+  }, [publicKey, fetchRecentTransactions]);
 
   if (!publicKey) {
     return (

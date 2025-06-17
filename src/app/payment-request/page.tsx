@@ -62,19 +62,31 @@ const PaymentRequest = () => {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to create payment request");
+        throw new Error(data.error || "Failed to create payment request");
       }
 
-      toast.success("Payment request created successfully!");
+      toast.success("Payment request created successfully!", {
+        description: `Request for ${parseFloat(formData.amount).toFixed(
+          4
+        )} SOL has been sent.`,
+        duration: 5000,
+      });
+
       setFormData({
         requestedPublicKey: "",
         amount: "",
         description: "",
       });
     } catch (error) {
-      toast.error("Failed to create payment request");
       console.error(error);
+      toast.error("Failed to create payment request", {
+        description:
+          error instanceof Error ? error.message : "Please try again later",
+        duration: 5000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +99,10 @@ const PaymentRequest = () => {
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-8">
             Create Payment Request
           </h1>
+
+          <p className="text-sm text-gray-500">
+            Let&apos;s get started with your first payment request!
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">

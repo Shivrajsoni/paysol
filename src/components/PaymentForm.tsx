@@ -5,7 +5,7 @@ import { usePayment } from "@/context/PaymentContext";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { CheckCircle2, XCircle, Users, ArrowRight } from "lucide-react";
+import { Users, ArrowRight } from "lucide-react";
 
 export default function PaymentForm() {
   const { selectedContact } = useContact();
@@ -25,13 +25,7 @@ export default function PaymentForm() {
 
       toast({
         variant: "success",
-        //@ts-ignore
-        title: (
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-500" />
-            <span>Payment Successful!</span>
-          </div>
-        ),
+        title: "Payment Successful!",
         description: (
           <div className="mt-2 space-y-1">
             <p className="text-sm font-medium">Transaction Details:</p>
@@ -55,13 +49,7 @@ export default function PaymentForm() {
 
       toast({
         variant: "destructive",
-        //@ts-ignore
-        title: (
-          <div className="flex items-center gap-2">
-            <XCircle className="h-5 w-5 text-red-500" />
-            <span>Payment Failed</span>
-          </div>
-        ),
+        title: "Payment Failed",
         description: (
           <div className="mt-2 space-y-1">
             <p className="text-sm font-medium">Error Details:</p>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useCallback, useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   PublicKey,
   SystemProgram,
@@ -100,6 +100,7 @@ export default function PaymentCard() {
       try {
         receiverPublicKey = new PublicKey(receiverPubkey);
       } catch (error) {
+        console.log(error);
         toast.error("Invalid receiver public key");
         setTransactionStatus({
           status: "error",

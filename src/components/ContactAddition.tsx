@@ -43,6 +43,7 @@ const ContactAddition = () => {
       try {
         new PublicKey(receiverPubkey);
       } catch (error) {
+        console.log(error);
         toast.error("Invalid public key format");
         setStatus({ type: "error", message: "Invalid public key" });
         return;

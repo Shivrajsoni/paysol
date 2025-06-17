@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
           select: {
             username: true,
             PublicKey: true,
+            clerkId: true,
           },
         },
       },
@@ -40,9 +41,18 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Enhance the response with usernames
+    const enhancedPayments = pendingPayments.map((payment) => ({
+      ...payment,
+      sender: {
+        ...payment.sender,
+        username: payment.sender.username || "Unknown User",
+      },
+    }));
+
     return NextResponse.json({
       message: "Pending payments fetched successfully",
-      data: pendingPayments,
+      data: enhancedPayments,
     });
   } catch (error) {
     console.error("Error fetching pending payments:", error);
