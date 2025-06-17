@@ -4,6 +4,7 @@ import { ThemeProvider } from "./theme-provider";
 import { PaymentProvider } from "@/context/PaymentContext";
 import { ContactProvider } from "@/context/ContactContext";
 import WalletConnector from "./walletConnector";
+import Header from "./header";
 
 export function Provider({ children }: { children: React.ReactNode }) {
   return (
@@ -15,7 +16,10 @@ export function Provider({ children }: { children: React.ReactNode }) {
     >
       <ContactProvider>
         <PaymentProvider>
-          <WalletConnector>{children}</WalletConnector>
+          <WalletConnector>
+            <Header />
+            {children}
+          </WalletConnector>
         </PaymentProvider>
       </ContactProvider>
     </ThemeProvider>

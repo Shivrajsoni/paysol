@@ -134,23 +134,14 @@ export default function Home() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              Pay to the Known One's
+              Pay to the Known One's Only
             </motion.h1>
-            <motion.p
-              className="text-zinc-500 dark:text-zinc-400 max-w-sm"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              Select a contact from your list to start sending SOL instantly.
-              Your trusted network is just a click away.
-            </motion.p>
           </div>
         </motion.div>
 
         {/* Main Content */}
         <motion.div
-          className="max-w-7xl mx-auto"
+          className="max-w-7xl mx-auto pt-1"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
