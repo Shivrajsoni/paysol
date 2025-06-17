@@ -71,3 +71,9 @@
     - how can i add solana tokens in user wallet by taking payments from them , like an exchange for usd ?
 
 -
+
+fix: deployments
+contact creation not wroking
+payment request page fix
+and also recentransaction fetch page fix ,
+most probably database need to be fixed up
